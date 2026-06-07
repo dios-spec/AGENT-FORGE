@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+<title>Agent Forge</title>
+<meta name="theme-color" content="#0b0d12" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--panel:#12151c;--panel2:#171b24;--line:rgba(255,255,255,.09);
+--txt:#e8eaf0;--mut:#8b93a7;--dim:#5b6276;--cyan:#6ee7ff;--lime:#a3e635;--pink:#ff6b9d;--gold:#ffce5a;--nav:64px;--top:62px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--txt);
+background-image:radial-gradient(700px 420px at 90% -8%,rgba(110,231,255,.08),transparent 60%),radial-gradient(700px 420px at -10% 108%,rgba(163,230,53,.06),transparent 60%);overflow:hidden}
+::selection{background:var(--cyan);color:#06121a}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--top);z-index:30;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(11,13,18,.9);backdrop-filter:blur(10px)}
+.logo{height:46px;width:auto;display:block}
+.demobtn{font-family:inherit;font-size:12px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--txt)}
+.pages{position:fixed;top:var(--top);bottom:var(--nav);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page{display:none;padding:16px 16px 28px;max-width:880px;margin:0 auto}.page.on{display:block}
+.h{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin:4px 0 10px;font-weight:600}
+.sub{font-size:12.5px;color:var(--mut);line-height:1.5;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.note{background:rgba(110,231,255,.06);border:1px solid rgba(110,231,255,.25);border-radius:12px;padding:11px 13px;font-size:12px;color:#bfe9f5;line-height:1.5;margin-bottom:12px}
+.field{margin-bottom:13px}.field:last-child{margin-bottom:0}
+.flabel{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mut);margin-bottom:7px;flex-wrap:wrap}
+.flabel b{color:var(--txt);font-weight:600}
+.tag{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:999px}
+.tag.here{background:rgba(163,230,53,.14);color:var(--lime)}
+.tag.host{background:rgba(255,206,90,.12);color:var(--gold)}
+.dot{width:9px;height:9px;border-radius:50%;background:#3a3f4d;transition:.2s;margin-left:auto;flex-shrink:0}
+.dot.on{background:var(--lime);box-shadow:0 0 10px var(--lime)}
+input[type=password],input[type=text],textarea,select{width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--line);background:#0d1016;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:.18s}
+textarea{font-family:'Sora';font-size:15px;resize:vertical;min-height:54px;line-height:1.4}
+select{font-family:'Sora';font-size:13.5px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b93a7'><path d='M6 9L1 3h10z'/></svg>");background-repeat:no-repeat;background-position:right 13px center;padding-right:32px}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan)}
+.toggle{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut);margin-top:10px}.toggle input{width:auto}
+.agentcard .ah{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.aico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:#0d1016;border:1px solid var(--line)}
+.aname{font-weight:700;font-size:15px}.arole{font-size:11.5px;color:var(--dim)}
+.arow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.custommodel{margin-top:9px;display:none}
+.chips{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.chip{text-align:left;font-size:13px;color:var(--mut);background:#0d1016;border:1px solid var(--line);padding:11px 13px;border-radius:11px;line-height:1.35}
+.chip:active{border-color:var(--cyan);color:#fff}
+.atrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.atchip{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#cfe9c2;background:rgba(163,230,53,.08);border:1px solid rgba(163,230,53,.28);padding:7px 10px;border-radius:999px;font-family:'JetBrains Mono'}
+.atchip b{cursor:pointer;color:var(--pink);font-weight:700}
+.runbtn{width:100%;margin-top:12px;padding:15px;border:none;border-radius:13px;font-family:inherit;font-weight:700;font-size:16px;background:linear-gradient(135deg,var(--cyan),var(--lime));color:#06121a}
+.runbtn:disabled{opacity:.55}
+.toolrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.tool{flex:1;min-width:74px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0d1016;color:var(--mut);font-family:inherit;font-size:12px;font-weight:600}
+.tool:active{color:var(--cyan)}
+.pipe{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.pnode{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel);transition:.3s}
+.pi{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:16px;background:#0d1016;border:1px solid var(--line);flex-shrink:0;transition:.3s}
+.pn{font-size:13.5px;font-weight:600}.pm{font-size:11px;color:var(--dim);word-break:break-word}.pmeta{min-width:0}
+.pnode.active{border-color:var(--cyan);box-shadow:0 0 20px -6px var(--cyan)}
+.pnode.active .pi{animation:pulse 1.1s infinite;border-color:var(--cyan)}
+.pnode.done .pi{border-color:var(--lime);color:var(--lime)}
+.pnode.err{border-color:var(--pink)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(110,231,255,.4)}50%{box-shadow:0 0 0 7px rgba(110,231,255,0)}}
+.console{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:14px;overflow:hidden}
+.chead{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono';font-size:11.5px;color:var(--mut)}
+.live{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.3}}
+.cbody{max-height:230px;overflow-y:auto;padding:10px 13px;font-family:'JetBrains Mono';font-size:11.5px}
+.cline{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.cwho{font-weight:600;margin-right:8px}.cmsg{color:#c2c7d3;word-break:break-word}.cempty{color:var(--dim)}
+.usage{padding:9px 13px;border-top:1px solid var(--line);font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim);display:flex;justify-content:space-between}
+.subtabs{display:flex;gap:6px;margin-bottom:12px}
+.subtab{flex:1;padding:11px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--mut);font-family:inherit;font-weight:600;font-size:13.5px}
+.subtab.on{background:var(--panel2);color:#fff;border-color:var(--cyan)}
+.previewwrap{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#06080c;min-height:60vh;display:flex}
+.frame{width:100%;height:62vh;border:none;background:#fff}
+.ph{flex:1;min-height:60vh;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;color:var(--dim);text-align:center;padding:24px}.ph .pbig{font-size:40px}
+.filetabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ftab{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:#0d1016;color:var(--dim);font-family:'JetBrains Mono';font-size:11px}
+.ftab.on{background:var(--panel2);color:var(--cyan);border-color:var(--cyan)}
+pre.code{border:1px solid var(--line);border-radius:13px;background:#0c0e13;padding:14px;overflow:auto;max-height:58vh;font-family:'JetBrains Mono';font-size:11.5px;line-height:1.6;color:#cdd2dc;white-space:pre-wrap;word-break:break-word}
+.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);z-index:30;display:flex;border-top:1px solid var(--line);background:rgba(11,13,18,.92);backdrop-filter:blur(12px);padding-bottom:env(safe-area-inset-bottom)}
+.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--dim);font-family:inherit;font-size:10px;font-weight:600}
+.navbtn .ni{font-size:19px;line-height:1}.navbtn.on{color:var(--cyan)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#262b36;border-radius:8px}
+@media(min-width:760px){.arow{grid-template-columns:1fr 1fr}.chips{flex-direction:row;flex-wrap:wrap}.chip{flex:1 1 46%}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <svg class="logo" viewBox="0 0 360 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent Forge">
+    <defs><linearGradient id="afg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7ff"/><stop offset="1" stop-color="#a3e635"/></linearGradient></defs>
+    <rect x="3" y="14" width="68" height="68" rx="16" fill="url(#afg)"/>
+    <text x="37" y="49" font-family="Sora,sans-serif" font-weight="800" font-size="33" fill="#06121a" text-anchor="middle" dominant-baseline="central">AF</text>
+    <text x="86" y="38" font-family="Sora,sans-serif" font-weight="800" font-size="29" fill="#6ee7ff">Agent</text>
+    <text x="86" y="74" font-family="Sora,sans-serif" font-weight="800" font-size="29" fill="#a3e635">Forge</text>
+  </svg>
+  <button class="demobtn" id="demoBtn">&#9654; Demo</button>
+</div>
+
+<div class="pages" id="pages">
+  <section class="page on" id="page-keys">
+    <div class="h">API Vault</div>
+    <div class="note">Default agents use <b>built-in Claude</b> &mdash; free, no key, works right here. Add keys below only to use other AIs.<br><span style="color:var(--lime)">&#9679; works here</span> &nbsp; <span style="color:var(--gold)">&#9679; best on hosted (https)</span></div>
+    <div class="card" id="vault"></div>
+    <div class="sub">A glowing dot = key detected. Pick which AI runs which job in the <b>Agents</b> tab. Keys stay on this device only.</div>
+  </section>
+
+  <section class="page" id="page-agents">
+    <div class="h">Agent Team &mdash; 8 specialists</div>
+    <div class="sub">Researcher &rarr; Planner &rarr; UI/UX &rarr; Frontend + Backend (parallel) &rarr; QA &rarr; Optimizer &rarr; Reviewer. Each builds on the last. Pick any provider + model per agent; choose <b>Custom&hellip;</b> for any model id.</div>
+    <div id="roster"></div>
+    <div class="card"><label class="toggle"><input type="checkbox" id="maxeffort" checked> max effort (bigger budgets + deeper polish)</label></div>
+  </section>
+
+  <section class="page" id="page-build">
+    <div class="h">Build</div>
+    <div class="card">
+      <div class="flabel"><b>Describe the app to build</b></div>
+      <textarea id="prompt" spellcheck="false" placeholder="e.g. A multi-page SaaS site: Home, Features, Pricing, Contact"></textarea>
+      <div class="atrow"><button class="tool" id="attachBtn" style="flex:0 0 auto">&#128206; Attach files</button></div>
+      <input type="file" id="fileInput" multiple style="display:none">
+      <div class="atrow" id="attachList"></div>
+      <div class="chips" id="chips"></div>
+      <button class="runbtn" id="runBtn">&#9889; Run team build</button>
+      <div class="toolrow">
+        <button class="tool" id="saveBtn">&#128190; Save project</button>
+        <select id="projSel" style="flex:2"></select>
+        <button class="tool" id="delBtn" style="flex:0 0 46px">&#128465;</button>
+      </div>
+    </div>
+    <div class="pipe" id="pipe"></div>
+    <div class="console">
+      <div class="chead"><span class="live"></span> agent collaboration log</div>
+      <div class="cbody" id="cbody"><div class="cempty">Idle. Hit Run (built-in Claude works with no key), or add keys for other AIs.</div></div>
+      <div class="usage"><span id="uStatus">ready</span><span id="uTokens">~0 tokens</span></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-output">
+    <div class="h">Output</div>
+    <div class="subtabs"><button class="subtab on" data-sub="preview">&#128065; Preview</button><button class="subtab" data-sub="code">&#10216;&#10217; Code &amp; docs</button></div>
+    <div id="sub-preview">
+      <div class="toolrow" id="prevtools" style="display:none">
+        <button class="tool" id="wFull">Desktop</button><button class="tool" id="wMob">Mobile</button>
+        <button class="tool" id="refreshBtn">&#8635; Refresh</button><button class="tool" id="popBtn">&#8689; New tab</button>
+      </div>
+      <div class="previewwrap" id="previewView">
+        <div class="ph"><div class="pbig">&#10022;</div><p>Your live multi-page app renders here.<br>Tap <b>Demo</b> up top to see it now.</p><button class="demobtn" id="demoBtn2">Load demo preview</button></div>
+      </div>
+    </div>
+    <div id="sub-code" style="display:none">
+      <div class="filetabs" id="filetabs"></div>
+      <div class="toolrow"><button class="tool" id="copyBtn">&#10697; Copy</button><button class="tool" id="dlBtn">&#11015; Download</button></div>
+      <pre class="code"><code id="codeText">// nothing built yet</code></pre>
+    </div>
+  </section>
+</div>
+
+<div class="nav" id="nav">
+  <button class="navbtn on" data-page="keys"><span class="ni">&#128273;</span>Keys</button>
+  <button class="navbtn" data-page="agents"><span class="ni">&#129302;</span>Agents</button>
+  <button class="navbtn" data-page="build"><span class="ni">&#9889;</span>Build</button>
+  <button class="navbtn" data-page="output"><span class="ni">&#128241;</span>Output</button>
+</div>
+
+<script>
+"use strict";
+var PROV={
+  builtin:{label:"Claude (built-in, free)",kind:"builtin",where:"here",models:[["claude-sonnet-4-20250514","Claude Sonnet 4 (free)"]]},
+  google:{label:"Google Gemini",kind:"google",where:"here",base:"",models:[["gemini-3.1-pro-preview","Gemini 3.1 Pro"],["gemini-3.5-flash","Gemini 3.5 Flash"],["gemini-2.5-flash-lite","Gemini 2.5 Flash-Lite"],["custom","Custom\u2026"]]},
+  openrouter:{label:"OpenRouter (any model)",kind:"oai",where:"here",base:"https://openrouter.ai/api/v1",models:[["anthropic/claude-opus-4.8","Claude Opus 4.8"],["openai/gpt-5.5","GPT-5.5"],["google/gemini-3.1-pro","Gemini 3.1 Pro"],["x-ai/grok-4.3","Grok 4.3"],["deepseek/deepseek-v4","DeepSeek V4"],["custom","Custom (vendor/model)\u2026"]]},
+  anthropic:{label:"Anthropic (your key)",kind:"anthropic",where:"host",base:"",models:[["claude-opus-4-8","Claude Opus 4.8"],["claude-opus-4-7","Claude Opus 4.7"],["claude-sonnet-4-6","Claude Sonnet 4.6"],["claude-haiku-4-5-20251001","Claude Haiku 4.5"],["custom","Custom\u2026"]]},
+  openai:{label:"OpenAI GPT",kind:"oai",where:"host",base:"https://api.openai.com/v1",models:[["gpt-5.5","GPT-5.5"],["gpt-5.4","GPT-5.4"],["gpt-5-mini","GPT-5 mini"],["gpt-4o","GPT-4o"],["custom","Custom\u2026"]]},
+  xai:{label:"xAI Grok",kind:"oai",where:"host",base:"https://api.x.ai/v1",models:[["grok-4.3","Grok 4.3"],["grok-4-1-fast-reasoning","Grok 4.1 Fast"],["grok-code-fast-1","Grok Code Fast"],["custom","Custom\u2026"]]},
+  deepseek:{label:"DeepSeek",kind:"oai",where:"host",base:"https://api.deepseek.com/v1",models:[["deepseek-v4-pro","DeepSeek V4 Pro"],["deepseek-v4-flash","DeepSeek V4 Flash"],["custom","Custom\u2026"]]},
+  mistral:{label:"Mistral",kind:"oai",where:"host",base:"https://api.mistral.ai/v1",models:[["mistral-large-latest","Mistral Large"],["mistral-medium-latest","Mistral Medium"],["codestral-latest","Codestral (coding)"],["custom","Custom\u2026"]]},
+  groq:{label:"Groq (fast)",kind:"oai",where:"host",base:"https://api.groq.com/openai/v1",models:[["llama-3.3-70b-versatile","Llama 3.3 70B"],["custom","Custom\u2026"]]},
+  together:{label:"Together AI",kind:"oai",where:"host",base:"https://api.together.xyz/v1",models:[["deepseek-ai/DeepSeek-V3","DeepSeek V3"],["meta-llama/Llama-3.3-70B-Instruct-Turbo","Llama 3.3 70B"],["custom","Custom\u2026"]]},
+  perplexity:{label:"Perplexity",kind:"oai",where:"host",base:"https://api.perplexity.ai",models:[["sonar-pro","Sonar Pro"],["sonar","Sonar"],["custom","Custom\u2026"]]}
+};
+var PKEYS=["builtin","google","openrouter","anthropic","openai","xai","deepseek","mistral","groq","together","perplexity"];
+var KEYNEED=["google","openrouter","anthropic","openai","xai","deepseek","mistral","groq","together","perplexity"];
+
+var AGENTS=[
+  {id:"researcher",name:"Researcher",role:"clarifies the brief",icon:"\uD83D\uDD2C"},
+  {id:"planner",name:"Planner",role:"product & architecture",icon:"\uD83E\uDDED"},
+  {id:"uiux",name:"UI/UX",role:"premium design system",icon:"\uD83C\uDFA8"},
+  {id:"frontend",name:"Frontend",role:"builds multi-page UI",icon:"\uD83D\uDDA5\uFE0F"},
+  {id:"backend",name:"Backend",role:"data & logic plan",icon:"\uD83D\uDDC4\uFE0F"},
+  {id:"qa",name:"QA",role:"finds the problems",icon:"\uD83D\uDD0D"},
+  {id:"optimizer",name:"Optimizer",role:"perf, SEO, a11y",icon:"\u26A1"},
+  {id:"reviewer",name:"Reviewer",role:"final production polish",icon:"\uD83D\uDEE1\uFE0F"}
+];
+var EXAMPLES=["A multi-page SaaS site: Home, Features, Pricing, Contact","A finance dashboard with budgets, charts and dark mode","A pomodoro focus timer with session stats","A markdown note app with tags and search"];
+function $(s){return document.querySelector(s);}
+var apiKeys={};
+var state={research:"",plan:"",design:"",backend:"",qa:"",html:"",tokens:0,running:false,attachments:[]};
+
+function buildVault(){var v=$("#vault");v.innerHTML="";KEYNEED.forEach(function(pk){var p=PROV[pk];var f=document.createElement("div");f.className="field";f.innerHTML='<div class="flabel"><b>'+p.label+'</b> <span class="tag '+(p.where==="here"?"here":"host")+'">'+(p.where==="here"?"works here":"https")+'</span><span class="dot" id="dot-'+pk+'"></span></div><input type="password" id="key-'+pk+'" placeholder="paste '+p.label+' key" autocomplete="off">';v.appendChild(f);f.querySelector("input").addEventListener("input",function(e){apiKeys[pk]=e.target.value.trim();$("#dot-"+pk).classList.toggle("on",!!apiKeys[pk]);saveKeys();});});}
+function saveKeys(){try{localStorage.setItem("af_keys",JSON.stringify(apiKeys));}catch(e){}}
+function loadKeys(){try{var k=JSON.parse(localStorage.getItem("af_keys")||"{}");Object.keys(k).forEach(function(pk){var el=$("#key-"+pk);if(el&&k[pk]){el.value=k[pk];apiKeys[pk]=k[pk];var d=$("#dot-"+pk);if(d)d.classList.add("on");}});}catch(e){}}
+
+function buildRoster(){var r=$("#roster");r.innerHTML="";AGENTS.forEach(function(a){var c=document.createElement("div");c.className="card agentcard";c.id="card-"+a.id;c.innerHTML='<div class="ah"><div class="aico">'+a.icon+'</div><div><div class="aname">'+a.name+'</div><div class="arole">'+a.role+'</div></div></div><div class="arow"><select class="selprov"></select><select class="selmodel"></select></div><input type="text" class="custommodel" placeholder="custom model id">';r.appendChild(c);var sp=c.querySelector(".selprov");PKEYS.forEach(function(pk){var o=document.createElement("option");o.value=pk;o.textContent=PROV[pk].label;sp.appendChild(o);});sp.value="builtin";fillModels(a.id,"builtin");sp.addEventListener("change",function(){fillModels(a.id,sp.value);});c.querySelector(".selmodel").addEventListener("change",function(e){c.querySelector(".custommodel").style.display=(e.target.value==="custom")?"block":"none";});});}
+function fillModels(id,pk){var c=$("#card-"+id),sm=c.querySelector(".selmodel");sm.innerHTML="";PROV[pk].models.forEach(function(m){var o=document.createElement("option");o.value=m[0];o.textContent=m[1];sm.appendChild(o);});sm.value=PROV[pk].models[0][0];c.querySelector(".custommodel").style.display=(sm.value==="custom")?"block":"none";}
+function agentConfig(id){var c=$("#card-"+id),pk=c.querySelector(".selprov").value,model=c.querySelector(".selmodel").value;if(model==="custom")model=c.querySelector(".custommodel").value.trim();return {pk:pk,model:model};}
+function setAgentConfig(id,cfg){var c=$("#card-"+id);if(!c||!cfg)return;c.querySelector(".selprov").value=cfg.pk;fillModels(id,cfg.pk);var sm=c.querySelector(".selmodel");var has=Array.prototype.some.call(sm.options,function(o){return o.value===cfg.model;});if(has){sm.value=cfg.model;c.querySelector(".custommodel").style.display="none";}else{sm.value="custom";var cm=c.querySelector(".custommodel");cm.style.display="block";cm.value=cfg.model;}}
+
+function buildPipe(){var p=$("#pipe");p.innerHTML="";AGENTS.forEach(function(a){var n=document.createElement("div");n.className="pnode";n.id="pnode-"+a.id;n.innerHTML='<div class="pi">'+a.icon+'</div><div class="pmeta"><div class="pn">'+a.name+'</div><div class="pm" id="pm-'+a.id+'">'+a.role+'</div></div>';p.appendChild(n);});}
+function buildChips(){var c=$("#chips");c.innerHTML="";EXAMPLES.forEach(function(ex){var b=document.createElement("button");b.className="chip";b.textContent=ex;b.onclick=function(){$("#prompt").value=ex;};c.appendChild(b);});}
+function setNode(id,cls,msg){var n=$("#pnode-"+id);if(!n)return;n.classList.remove("active","done","err");if(cls)n.classList.add(cls);if(msg)$("#pm-"+id).textContent=msg;}
+function log(who,msg,color){var b=$("#cbody"),e=b.querySelector(".cempty");if(e)b.innerHTML="";var a=null;AGENTS.forEach(function(x){if(x.id===who)a=x;});var col=color||(a?"#6ee7ff":"#8b93a7");var l=document.createElement("div");l.className="cline";l.innerHTML='<span class="cwho" style="color:'+col+'">'+(a?a.name:(who||"system"))+'</span><span class="cmsg"></span>';l.querySelector(".cmsg").textContent=msg;b.appendChild(l);b.scrollTop=b.scrollHeight;}
+function addTokens(t){state.tokens+=t;$("#uTokens").textContent="~"+state.tokens.toLocaleString()+" tokens";}
+function est(s){return Math.round((s||"").length/4);}
+
+/* attachments */
+function handleFiles(list){Array.prototype.forEach.call(list,function(file){var img=/^image\//.test(file.type);var rd=new FileReader();rd.onload=function(){if(img){var b64=String(rd.result).split(",")[1];state.attachments.push({name:file.name,kind:"image",mime:file.type,data:b64});}else{state.attachments.push({name:file.name,kind:"text",text:String(rd.result).slice(0,20000)});}renderAttachments();};if(img)rd.readAsDataURL(file);else rd.readAsText(file);});}
+function renderAttachments(){var w=$("#attachList");w.innerHTML="";state.attachments.forEach(function(a,i){var c=document.createElement("span");c.className="atchip";c.innerHTML='<span>'+(a.kind==="image"?"\uD83D\uDDBC ":"\uD83D\uDCC4 ")+a.name+'</span><b data-i="'+i+'">\u00D7</b>';c.querySelector("b").onclick=function(){state.attachments.splice(i,1);renderAttachments();};w.appendChild(c);});}
+function attachText(){var t=state.attachments.filter(function(a){return a.kind==="text";});return t.length?("\n\nATTACHED FILES:\n"+t.map(function(a){return "--- "+a.name+" ---\n"+a.text;}).join("\n\n")):"";}
+function attachImages(){return state.attachments.filter(function(a){return a.kind==="image";}).map(function(a){return {mime:a.mime,data:a.data};});}
+
+async function callLLM(cfg,system,user,maxTokens,images){
+  var p=PROV[cfg.pk];if(!p)throw new Error("bad provider");
+  if(!cfg.model)throw new Error(p.label+": pick a model");
+  var key=apiKeys[cfg.pk]||"";images=images||[];
+  if(p.kind!=="builtin"&&!key)throw new Error(p.label+" key missing (Keys tab)");
+  if(p.kind==="builtin"||p.kind==="anthropic"){
+    var content=images.length?[{type:"text",text:user}].concat(images.map(function(im){return {type:"image",source:{type:"base64",media_type:im.mime,data:im.data}};})):user;
+    var hd={"Content-Type":"application/json"};
+    if(p.kind==="anthropic"){hd["x-api-key"]=key;hd["anthropic-version"]="2023-06-01";hd["anthropic-dangerous-direct-browser-access"]="true";}
+    var ra=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:hd,body:JSON.stringify({model:cfg.model,max_tokens:maxTokens,system:system,messages:[{role:"user",content:content}]})});
+    var da=await ra.json();if(!ra.ok)throw new Error((p.kind==="builtin"?"Claude: ":"Anthropic: ")+((da.error&&da.error.message)||ra.status));
+    return (da.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("").trim();
+  }
+  if(p.kind==="google"){
+    var parts=[{text:user}].concat(images.map(function(im){return {inline_data:{mime_type:im.mime,data:im.data}};}));
+    var url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(cfg.model)+":generateContent?key="+encodeURIComponent(key);
+    var rg=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents:[{role:"user",parts:parts}],generationConfig:{maxOutputTokens:maxTokens}})});
+    var dg=await rg.json();if(!rg.ok)throw new Error("Gemini: "+((dg.error&&dg.error.message)||rg.status));
+    var pr=(dg.candidates&&dg.candidates[0]&&dg.candidates[0].content&&dg.candidates[0].content.parts)||[];
+    return pr.map(function(x){return x.text||"";}).join("").trim();
+  }
+  var uc=images.length?[{type:"text",text:user}].concat(images.map(function(im){return {type:"image_url",image_url:{url:"data:"+im.mime+";base64,"+im.data}};})):user;
+  var body={model:cfg.model,messages:[{role:"system",content:system},{role:"user",content:uc}]};
+  if(cfg.pk==="openai")body.max_completion_tokens=maxTokens;else body.max_tokens=maxTokens;
+  var ro=await fetch(p.base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
+  var dox=await ro.json();if(!ro.ok)throw new Error(p.label+": "+((dox.error&&dox.error.message)||ro.status));
+  return ((dox.choices&&dox.choices[0]&&dox.choices[0].message&&dox.choices[0].message.content)||"").trim();
+}
+function extractHtml(raw){var t=(raw||"").replace(/```html/gi,"").replace(/```/g,"").trim();var s=t.search(/<!DOCTYPE|<html/i),e=t.lastIndexOf("</html>");if(s!==-1&&e!==-1)t=t.slice(s,e+7);return t.trim();}
+
+async function run(){
+  if(state.running)return;
+  var prompt=$("#prompt").value.trim();
+  if(!prompt){log("system","Describe your app first.","#ff6b9d");go("build");return;}
+  state.running=true;state.tokens=0;state.research=state.plan=state.design=state.backend=state.qa=state.html="";
+  $("#runBtn").disabled=true;$("#uTokens").textContent="~0 tokens";$("#cbody").innerHTML="";buildPipe();$("#uStatus").textContent="building\u2026";go("build");
+  var big=$("#maxeffort").checked;function cfg(id){return agentConfig(id);}
+  function nm(id){var c=cfg(id);return PROV[c.pk].label.split(" ")[0]+"/"+c.model;}
+  var imgs=attachImages(),atx=attachText();
+  var MP="Build a MULTI-PAGE app as ONE self-contained index.html: implement EVERY page from the plan (e.g. Home plus all others) as distinct full views with a working nav bar/menu and client-side routing (JS show/hide or hash routing). Each page must be fully designed and functional. Inline <style> and <script>, vanilla JS, no build step, mobile-first, responsive, animated, accessible. Must run as-is in an iframe. Output ONLY the raw HTML document.";
+  try{
+    setNode("researcher","active","researching\u2026");log("researcher","["+nm("researcher")+"] reading brief"+(state.attachments.length?" + "+state.attachments.length+" file(s)":""));
+    state.research=await callLLM(cfg("researcher"),"You are a senior product researcher. Clarify the request using any attached files/images. Output concise markdown: # Understanding, # Target Audience, # Key Requirements, # Pages Needed, # Inspirations, # Assumptions. No code.","User request: "+prompt+atx,big?1200:800,imgs);
+    addTokens(est(state.research));setNode("researcher","done","brief ready");log("researcher","brief ready \u2192 Planner");
+
+    setNode("planner","active","planning\u2026");log("planner","["+nm("planner")+"] vision, features, pages, architecture");
+    state.plan=await callLLM(cfg("planner"),"You are a world-class Product Manager and Software Architect. Output concise but complete markdown: # Product Vision, # Target Users, # Core Features, # User Flow, # Pages (list every page), # Components, # Database Structure, # API Requirements, # Technical Architecture, # Development Roadmap. No code.","RESEARCH:\n"+state.research+"\n\nUser request: "+prompt+atx,big?1800:1200,imgs);
+    addTokens(est(state.plan));setNode("planner","done","plan ready");log("planner","plan ready \u2192 UI/UX");
+
+    setNode("uiux","active","designing\u2026");log("uiux","["+nm("uiux")+"] premium design system");
+    state.design=await callLLM(cfg("uiux"),"You are a senior product designer (Apple, Stripe, Linear, Framer, Vercel). Output a premium design system in markdown: # Design Direction, # Color System (hex), # Typography, # Spacing, # Component Library, # Layout, # Animation Guidelines, # Mobile Rules, # Accessibility. No code.","PLAN:\n"+state.plan,big?1300:900);
+    addTokens(est(state.design));setNode("uiux","done","design locked");log("uiux","design locked \u2192 Frontend + Backend");
+
+    setNode("frontend","active","coding pages\u2026");setNode("backend","active","designing API\u2026");
+    log("frontend","["+nm("frontend")+"] building multi-page index.html");log("backend","["+nm("backend")+"] data, API, auth, security");
+    var feP=callLLM(cfg("frontend"),"You are an elite frontend engineer. "+MP,"PLAN:\n"+state.plan+"\n\nDESIGN:\n"+state.design+"\n\nUser idea: "+prompt,big?16000:9000);
+    var beP=callLLM(cfg("backend"),"You are a senior backend engineer. From the plan, output a concise production-ready backend plan in markdown: # Database Architecture, # API Endpoints, # Authentication, # Business Logic, # Integrations, # Security, # Scalability. Tiny snippets only if needed.","PLAN:\n"+state.plan,big?1300:900);
+    var pair=await Promise.all([feP.catch(function(e){return "__ERR__"+e.message;}),beP.catch(function(e){return "__ERR__"+e.message;})]);
+    if(pair[0].indexOf("__ERR__")===0)throw new Error(pair[0].slice(7));
+    state.html=extractHtml(pair[0]);renderPreview();addTokens(est(pair[0]));setNode("frontend","done","pages built");
+    state.backend=(pair[1].indexOf("__ERR__")===0)?("Backend step error: "+pair[1].slice(7)):pair[1];addTokens(est(state.backend));setNode("backend","done","plan ready");
+    log("frontend","multi-page UI built");log("backend","backend plan ready \u2192 QA");
+
+    setNode("qa","active","reviewing\u2026");log("qa","["+nm("qa")+"] bugs, UX, security, a11y");
+    state.qa=await callLLM(cfg("qa"),"You are a senior QA engineer. Review the multi-page frontend, backend plan and design. Output markdown: # QA Report, # Problems Found (bugs, missing pages/features, broken nav/logic, UX, security, a11y, performance), # Improvements Required (prioritized). Be specific; check every page works.","DESIGN:\n"+state.design+"\n\nBACKEND:\n"+state.backend+"\n\nFRONTEND HTML:\n"+state.html,big?1600:1000);
+    addTokens(est(state.qa));setNode("qa","done","report ready");log("qa","QA report \u2192 Optimizer");
+
+    setNode("optimizer","active","optimizing\u2026");log("optimizer","["+nm("optimizer")+"] perf, SEO, accessibility");
+    var opt=await callLLM(cfg("optimizer"),"You are a performance, SEO and accessibility engineer. Improve the given multi-page index.html: faster load, per-page <title>/meta, semantic HTML, ARIA, keyboard nav, reduced layout shift. Keep ALL pages working and ONE self-contained file. Output ONLY the final raw HTML.",state.html,big?16000:9000);
+    state.html=extractHtml(opt);renderPreview();addTokens(est(opt));setNode("optimizer","done","optimized");log("optimizer","optimized \u2192 Reviewer");
+
+    setNode("reviewer","active","polishing\u2026");log("reviewer","["+nm("reviewer")+"] applying QA fixes, production polish");
+    var fin=await callLLM(cfg("reviewer"),"You are a Principal Engineer and Design Director (Linear, Notion, Stripe, Framer, Vercel). Apply the QA fixes to the multi-page index.html and raise it to production, investor-level polish: fix bugs, improve UX, code quality, performance, accessibility, responsiveness and visuals. Keep every page working and ONE self-contained file. Output ONLY the final raw HTML.","QA REPORT:\n"+state.qa+"\n\nCURRENT index.html:\n"+state.html,big?16000:9000);
+    state.html=extractHtml(fin);renderPreview();addTokens(est(fin));setNode("reviewer","done","shipped \u2713");log("reviewer","shipped \u2713 \u2014 Output tab");
+    $("#uStatus").textContent="done";go("output");
+  }catch(e){
+    log("system","\u2715 "+e.message,"#ff6b9d");$("#uStatus").textContent="error";
+    AGENTS.forEach(function(a){var n=$("#pnode-"+a.id);if(n&&n.classList.contains("active"))setNode(a.id,"err","failed");});
+  }finally{state.running=false;$("#runBtn").disabled=false;updateOutBtns();}
+}
+
+var frameWidth="full";
+function renderPreview(){var w=$("#previewView");w.innerHTML="";var f=document.createElement("iframe");f.className="frame";if(frameWidth==="mob")f.style.maxWidth="390px";f.setAttribute("sandbox","allow-scripts allow-same-origin allow-forms allow-popups allow-modals");f.srcdoc=state.html;w.appendChild(f);updateOutBtns();}
+function updateOutBtns(){$("#prevtools").style.display=state.html?"flex":"none";}
+function files(){return[{id:"research",name:"research.md",body:state.research},{id:"plan",name:"plan.md",body:state.plan},{id:"design",name:"design.md",body:state.design},{id:"backend",name:"backend.md",body:state.backend},{id:"qa",name:"qa.md",body:state.qa},{id:"index",name:"index.html",body:state.html}];}
+var curFile="index";
+function renderFileTabs(){var ft=$("#filetabs");ft.innerHTML="";files().forEach(function(f){var b=document.createElement("button");b.className="ftab"+(f.id===curFile?" on":"");b.textContent=f.name;b.onclick=function(){curFile=f.id;renderFileTabs();renderCode();};ft.appendChild(b);});}
+function renderCode(){var f=null;files().forEach(function(x){if(x.id===curFile)f=x;});if(!f)f=files()[5];$("#codeText").textContent=f.body||"// nothing built yet";}
+function switchSub(t){var ts=document.querySelectorAll(".subtab");for(var i=0;i<ts.length;i++)ts[i].classList.toggle("on",ts[i].getAttribute("data-sub")===t);$("#sub-preview").style.display=t==="preview"?"block":"none";$("#sub-code").style.display=t==="code"?"block":"none";if(t==="code"){renderFileTabs();renderCode();}}
+function go(page){var ps=document.querySelectorAll(".page");for(var i=0;i<ps.length;i++)ps[i].classList.toggle("on",ps[i].id==="page-"+page);var nb=document.querySelectorAll(".navbtn");for(var j=0;j<nb.length;j++)nb[j].classList.toggle("on",nb[j].getAttribute("data-page")===page);$("#pages").scrollTop=0;}
+
+/* projects */
+function getProjects(){try{return JSON.parse(localStorage.getItem("af_projects")||"{}");}catch(e){return {};}}
+function refreshProjects(sel){var s=$("#projSel");var P=getProjects();s.innerHTML='<option value="">Load project\u2026</option>';Object.keys(P).sort().forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;s.appendChild(o);});if(sel)s.value=sel;}
+function saveProject(){var name=window.prompt("Project name:",($("#prompt").value.slice(0,24)||"My project"));if(!name)return;var cfgs={};AGENTS.forEach(function(a){cfgs[a.id]=agentConfig(a.id);});var P=getProjects();P[name]={prompt:$("#prompt").value,cfgs:cfgs,research:state.research,plan:state.plan,design:state.design,backend:state.backend,qa:state.qa,html:state.html,ts:Date.now()};try{localStorage.setItem("af_projects",JSON.stringify(P));}catch(e){log("system","save failed (storage blocked here \u2014 works when hosted/downloaded)","#ffce5a");return;}refreshProjects(name);log("system","saved project: "+name,"#a3e635");}
+function loadProject(name){var P=getProjects(),p=P[name];if(!p)return;$("#prompt").value=p.prompt||"";if(p.cfgs)AGENTS.forEach(function(a){if(p.cfgs[a.id])setAgentConfig(a.id,p.cfgs[a.id]);});state.research=p.research||"";state.plan=p.plan||"";state.design=p.design||"";state.backend=p.backend||"";state.qa=p.qa||"";state.html=p.html||"";if(state.html){renderPreview();}log("system","loaded project: "+name,"#6ee7ff");go("build");}
+function delProject(){var name=$("#projSel").value;if(!name){log("system","pick a project to delete","#ffce5a");return;}if(!window.confirm("Delete project: "+name+"?"))return;var P=getProjects();delete P[name];try{localStorage.setItem("af_projects",JSON.stringify(P));}catch(e){}refreshProjects();log("system","deleted: "+name,"#ff6b9d");}
+
+var DEMO_HTML='<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{margin:0;box-sizing:border-box;font-family:system-ui,sans-serif}body{background:#0f1117;color:#fff;min-height:100vh}nav{display:flex;gap:6px;padding:14px;justify-content:center;border-bottom:1px solid #222}nav button{background:none;border:none;color:#8b93a7;font-size:14px;font-weight:600;padding:8px 14px;border-radius:9px}nav button.on{background:#1b2030;color:#6ee7ff}.view{display:none;padding:40px 20px;text-align:center}.view.on{display:block}h1{font-size:30px;margin-bottom:10px;background:linear-gradient(135deg,#6ee7ff,#a3e635);-webkit-background-clip:text;background-clip:text;color:transparent}p{color:#9aa;max-width:420px;margin:0 auto 18px}.cta{padding:13px 26px;border:none;border-radius:12px;font-weight:600;color:#06121a;background:linear-gradient(135deg,#6ee7ff,#a3e635)}.cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:20px}.cc{background:#161a22;border:1px solid #242a36;border-radius:14px;padding:20px;width:150px}</style></head><body><nav><button class="on" data-v="home">Home</button><button data-v="features">Features</button><button data-v="pricing">Pricing</button></nav><div class="view on" id="home"><h1>Multi-Page Demo</h1><p>Three real pages, one file. Tap the nav above to switch.</p><button class="cta" onclick="sw(\'pricing\')">See pricing</button></div><div class="view" id="features"><h1>Features</h1><div class="cards"><div class="cc">Fast</div><div class="cc">Responsive</div><div class="cc">Animated</div></div></div><div class="view" id="pricing"><h1>Pricing</h1><div class="cards"><div class="cc"><b>Free</b><p>$0</p></div><div class="cc"><b>Pro</b><p>$9</p></div></div></div><script>function sw(v){document.querySelectorAll(".view").forEach(function(x){x.classList.toggle("on",x.id===v);});document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v);});}document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){sw(b.dataset.v);};});<\/script></body></html>';
+function loadDemo(){state.html=DEMO_HTML;state.research="(demo)";state.plan="(demo) Home, Features, Pricing pages.";state.design="(demo) Dark, cyan-lime.";state.backend="(demo) none.";state.qa="(demo) all good.";go("output");switchSub("preview");renderPreview();log("system","multi-page demo loaded \u2713","#a3e635");$("#uStatus").textContent="demo";}
+
+function init(){
+  buildVault();loadKeys();buildRoster();buildPipe();buildChips();refreshProjects();
+  $("#runBtn").onclick=run;$("#demoBtn").onclick=loadDemo;$("#demoBtn2").onclick=loadDemo;
+  $("#attachBtn").onclick=function(){$("#fileInput").click();};
+  $("#fileInput").onchange=function(e){handleFiles(e.target.files);e.target.value="";};
+  $("#saveBtn").onclick=saveProject;$("#delBtn").onclick=delProject;
+  $("#projSel").onchange=function(e){if(e.target.value)loadProject(e.target.value);};
+  var nb=document.querySelectorAll(".navbtn");for(var i=0;i<nb.length;i++){(function(b){b.onclick=function(){go(b.getAttribute("data-page"));};})(nb[i]);}
+  var stt=document.querySelectorAll(".subtab");for(var j=0;j<stt.length;j++){(function(b){b.onclick=function(){switchSub(b.getAttribute("data-sub"));};})(stt[j]);}
+  $("#wFull").onclick=function(){frameWidth="full";renderPreview();};
+  $("#wMob").onclick=function(){frameWidth="mob";renderPreview();};
+  $("#refreshBtn").onclick=renderPreview;
+  $("#popBtn").onclick=function(){var b=new Blob([state.html],{type:"text/html"});window.open(URL.createObjectURL(b),"_blank");};
+  $("#copyBtn").onclick=function(){var f=null;files().forEach(function(x){if(x.id===curFile)f=x;});navigator.clipboard.writeText((f&&f.body)||"");$("#copyBtn").textContent="\u2713 Copied";setTimeout(function(){$("#copyBtn").innerHTML="&#10697; Copy";},1100);};
+  $("#dlBtn").onclick=function(){var f=null;files().forEach(function(x){if(x.id===curFile)f=x;});var b=new Blob([(f&&f.body)||""],{type:"text/plain"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(f&&f.name)||"file.txt";a.click();};
+  if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){navigator.serviceWorker.register("sw.js").catch(function(){});}
+}
+window.__loadDemo=loadDemo;window.__go=go;
+init();
+</script>
+</body>
+</html>
